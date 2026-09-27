@@ -1,0 +1,286 @@
+# =============================================================================
+# Dashboard Home Assistant - versione Mobile
+# =============================================================================
+# Come usarla:
+#  1. In Home Assistant vai su Impostazioni > Dashboard > Aggiungi dashboard
+#     > "Nuova dashboard da zero", dagli un url_path con un trattino
+#     (es. "casa-mobile"), poi apri la dashboard e scegli
+#     "Modifica dashboard" (matita) > menu (...) > "Modifica in YAML".
+#  2. Incolla tutto il contenuto di questo file.
+#  3. Sostituisci ogni entity_id segnato con "<-- SOSTITUISCI" con le tue
+#     entità reali (Impostazioni > Dispositivi e servizi > Entità per
+#     trovare gli ID esatti).
+#  4. Se non usi un dominio (es. non hai un allarme), elimina la card o
+#     l'intera vista corrispondente.
+#
+# Perché è pensata per il telefono:
+#  - Più "views" (schede) invece di una lunga pagina unica: su mobile HA le
+#    mostra come barra di navigazione in basso, comoda da usare con il
+#    pollice.
+#  - Card "tile" con controlli rapidi integrati (slider, modalità...) così
+#    non serve aprire il pop-up "more-info" per le azioni più comuni.
+#  - Griglie a 2 colonne: bottoni grandi, facili da toccare, niente testo
+#    minuscolo.
+#  - I contenuti più usati (scene, preferiti, presenza) stanno in cima alla
+#    prima vista, quello secondario è nelle viste dedicate.
+# =============================================================================
+
+title: Casa
+views:
+  # ---------------------------------------------------------------------
+  # 1. CASA - vista principale, quello che serve al volo aprendo l'app
+  # ---------------------------------------------------------------------
+  - title: Casa
+    path: casa
+    icon: mdi:home
+    type: sections
+    max_columns: 2
+    badges:
+      - type: entity
+        entity: person.persona_1 # <-- SOSTITUISCI
+      - type: entity
+        entity: person.persona_2 # <-- SOSTITUISCI
+
+    sections:
+      - title: Scene rapide
+        cards:
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: button
+                name: Tutto spento
+                icon: mdi:power
+                tap_action:
+                  action: call-service
+                  service: light.turn_off
+                  target:
+                    entity_id: all
+              - type: button
+                name: Buonanotte
+                icon: mdi:weather-night
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.buonanotte # <-- SOSTITUISCI (crea lo script)
+              - type: button
+                name: Sono a casa
+                icon: mdi:home-import-outline
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.sono_a_casa # <-- SOSTITUISCI (crea lo script)
+
+      - title: Preferiti
+        cards:
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: tile
+                entity: climate.soggiorno # <-- SOSTITUISCI
+                name: Termostato
+                icon: mdi:thermostat
+                features:
+                  - type: target-temperature
+              - type: tile
+                entity: light.soggiorno # <-- SOSTITUISCI
+                name: Luci soggiorno
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: lock.porta_ingresso # <-- SOSTITUISCI
+                name: Porta d'ingresso
+                tap_action:
+                  action: toggle
+              - type: tile
+                entity: alarm_control_panel.allarme # <-- SOSTITUISCI
+                name: Allarme
+                features:
+                  - type: alarm-modes
+
+      - title: Meteo e sensori
+        cards:
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: tile
+                entity: weather.casa # <-- SOSTITUISCI
+                name: Meteo
+              - type: tile
+                entity: sensor.temperatura_esterna # <-- SOSTITUISCI
+                name: Temperatura esterna
+
+  # ---------------------------------------------------------------------
+  # 2. LUCI - raggruppate per ambiente
+  # ---------------------------------------------------------------------
+  - title: Luci
+    path: luci
+    icon: mdi:lightbulb
+    type: sections
+    max_columns: 2
+    sections:
+      - title: Soggiorno
+        cards:
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: light.soggiorno_principale # <-- SOSTITUISCI
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.soggiorno_lettura # <-- SOSTITUISCI
+                features:
+                  - type: light-brightness
+
+      - title: Cucina
+        cards:
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: light.cucina # <-- SOSTITUISCI
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.cucina_sottopensile # <-- SOSTITUISCI
+                features:
+                  - type: light-brightness
+
+      - title: Camera da letto
+        cards:
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: light.camera # <-- SOSTITUISCI
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.comodino # <-- SOSTITUISCI
+                features:
+                  - type: light-brightness
+
+      - title: Bagno e ingresso
+        cards:
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: light.bagno # <-- SOSTITUISCI
+              - type: tile
+                entity: light.ingresso # <-- SOSTITUISCI
+
+  # ---------------------------------------------------------------------
+  # 3. CLIMA - termostati e tapparelle
+  # ---------------------------------------------------------------------
+  - title: Clima
+    path: clima
+    icon: mdi:thermostat
+    type: sections
+    max_columns: 2
+    sections:
+      - title: Temperatura
+        cards:
+          - type: grid
+            columns: 1
+            cards:
+              - type: tile
+                entity: climate.soggiorno # <-- SOSTITUISCI
+                features:
+                  - type: target-temperature
+                  - type: climate-hvac-modes
+                    style: dropdown
+              - type: tile
+                entity: climate.camera # <-- SOSTITUISCI
+                features:
+                  - type: target-temperature
+                  - type: climate-hvac-modes
+                    style: dropdown
+
+      - title: Tapparelle
+        cards:
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: cover.soggiorno # <-- SOSTITUISCI
+                features:
+                  - type: cover-open-close
+              - type: tile
+                entity: cover.camera # <-- SOSTITUISCI
+                features:
+                  - type: cover-open-close
+
+  # ---------------------------------------------------------------------
+  # 4. SICUREZZA - allarme, serrature, sensori
+  # ---------------------------------------------------------------------
+  - title: Sicurezza
+    path: sicurezza
+    icon: mdi:shield-home
+    type: sections
+    max_columns: 2
+    sections:
+      - title: Allarme e accessi
+        cards:
+          - type: grid
+            columns: 1
+            cards:
+              - type: tile
+                entity: alarm_control_panel.allarme # <-- SOSTITUISCI
+                features:
+                  - type: alarm-modes
+              - type: tile
+                entity: lock.porta_ingresso # <-- SOSTITUISCI
+                features:
+                  - type: lock-commands
+
+      - title: Sensori porte e finestre
+        cards:
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: binary_sensor.porta_ingresso # <-- SOSTITUISCI
+              - type: tile
+                entity: binary_sensor.finestra_cucina # <-- SOSTITUISCI
+
+      - title: Telecamere
+        cards:
+          - type: grid
+            columns: 1
+            cards:
+              - type: tile
+                entity: camera.ingresso # <-- SOSTITUISCI
+                tap_action:
+                  action: more-info
+
+  # ---------------------------------------------------------------------
+  # 5. ENERGIA - consumi a colpo d'occhio
+  # ---------------------------------------------------------------------
+  - title: Energia
+    path: energia
+    icon: mdi:lightning-bolt
+    type: sections
+    max_columns: 2
+    sections:
+      - title: Consumo attuale
+        cards:
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: sensor.potenza_istantanea # <-- SOSTITUISCI
+                name: Potenza istantanea
+              - type: tile
+                entity: sensor.energia_oggi # <-- SOSTITUISCI
+                name: Energia oggi
+
+      - title: Dashboard energia
+        cards:
+          - type: energy-distribution
+            link_dashboard: true
